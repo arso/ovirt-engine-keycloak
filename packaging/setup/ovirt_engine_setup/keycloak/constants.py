@@ -17,6 +17,7 @@ from otopi import util
 
 from ovirt_engine_setup import constants as oesetupcons
 from ovirt_engine_setup.engine_common import config as oesetupcommconfig
+from ovirt_engine_setup.constants import classproperty
 from ovirt_engine_setup.constants import osetupattrs
 from ovirt_engine_setup.constants import osetupattrsclass
 from ovirt_engine_setup.engine import constants as oenginecons
@@ -38,6 +39,8 @@ class Const(object):
     OVIRT_ADMIN_USER = 'admin@ovirt'
     KEYCLOAK_INTERNAL_CLIENT_NAME = 'ovirt-engine-internal'
     KEYCLOAK_WEB_CONTEXT = 'ovirt-engine-auth'
+    KEYCLOAK_DB_SCHEMA = 'ovirt_engine_keycloak'
+    KEYCLOAK_DB_MAX_CONNECTIONS = 20
     OVIRT_CLIENT_SCOPES = [
         'ovirt-app-admin',
         'ovirt-app-api',
@@ -163,6 +166,10 @@ class FileLocations(oesetupcons.FileLocations):
 @util.export
 class Stages(object):
     CLIENT_SECRET_GENERATED = 'osetup.keycloak.core.client_secret'
+    ENGINE_DB_CONNECTION_AVAILABLE = \
+        'osetup.keycloak.engine.db.connection.available'
+    KEYCLOAK_DB_SCHEMA_AVAILABLE = \
+        'osetup.keycloak.engine.db.schema.available'
 
 
 # vim: expandtab tabstop=4 shiftwidth=4

@@ -67,6 +67,16 @@ class Plugin(plugin.PluginBase):
         userinfo_endpoint = self._build_endpoint_url("userinfo")
         token_endpoint = self._build_endpoint_url("token")
         logout_endpoint = self._build_endpoint_url("logout")
+
+        db_url = "jdbc:postgresql://{ENGINE_DB_HOST}:{ENGINE_DB_PORT}/{ENGINE_DB_DATABASE}" \
+                    "?sslfactory=org.postgresql.ssl.NonValidatingFactory" \
+                    "&currentSchema={KEYCLOAK_SCHEMA}".format(
+                        ENGINE_DB_HOST=self.environment[oenginecons.EngineDBEnv.HOST],
+                        ENGINE_DB_PORT=self.environment[oenginecons.EngineDBEnv.PORT],
+                        ENGINE_DB_DATABASE=self.environment[oenginecons.EngineDBEnv.DATABASE],
+                        KEYCLOAK_SCHEMA=okkcons.Const.KEYCLOAK_DB_SCHEMA,
+                    )
+
         self.environment[otopicons.CoreEnv.MAIN_TRANSACTION].append(
             filetransaction.FileTransaction(
                 name=okkcons.FileLocations.OVIRT_ENGINE_SERVICE_CONFIG_KEYCLOAK,
@@ -87,6 +97,10 @@ class Plugin(plugin.PluginBase):
                     'EXTERNAL_OIDC_HTTPS_PKI_TRUST_STORE_PASSWORD="{pki_trust_pass}"\n'
                     'EXTERNAL_OIDC_SSL_VERIFY_CHAIN=true\n'
                     'EXTERNAL_OIDC_SSL_VERIFY_HOST=false\n'
+                    'KEYCLOAK_DB_USER={keycloak_db_user}\n'
+                    'KEYCLOAK_DB_PASSWORD={keycloak_db_password}\n'
+                    'KEYCLOAK_DB_URL={keycloak_db_url}\n'
+                    'KEYCLOAK_DB_MAX_CONNECTIONS={keycloak_db_max_connections}\n'
                 ).format(
                     client_id=okkcons.Const.KEYCLOAK_INTERNAL_CLIENT_NAME,
                     client_secret=client_secret,
@@ -95,6 +109,13 @@ class Plugin(plugin.PluginBase):
                     logout_endpoint=logout_endpoint,
                     pki_trust_pass=oenginecons.Const.PKI_PASSWORD,
                     trust_store=oenginecons.FileLocations.OVIRT_ENGINE_PKI_ENGINE_TRUST_STORE,
+                    # keycloak_db_user=okkcons.Const.KEYCLOAK_DB_USER,
+                    keycloak_db_user=self.environment[oenginecons.EngineDBEnv.USER],
+                    # keycloak_db_password=self.environment[okkcons.DBEnv.KEYCLOAK_DB_USER_PASSWORD],
+                    keycloak_db_password=self.environment[oenginecons.EngineDBEnv.PASSWORD],
+                    keycloak_db_url=db_url,
+                    # keycloak_db_max_connections=okkcons.Const.KEYCLOAK_DB_MAX_CONNECTIONS,
+                    keycloak_db_max_connections=okkcons.Const.KEYCLOAK_DB_MAX_CONNECTIONS,
                 ),
                 modifiedList=self.environment[
                     otopicons.CoreEnv.MODIFIED_FILES
